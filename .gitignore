@@ -1,0 +1,34 @@
+# Игнорировать .env с конфиденциальными данными
+.env
+
+# Игнорировать бинарные файлы и артефакты сборки
+*.exe
+*.exe~
+*.dll
+*.so
+*.dylib
+bin/
+tmp/
+
+# Игнорировать файлы Go
+*.test
+*.prof
+vendor/
+
+# Игнорировать временные файлы и кэш
+*.swp
+*.swo
+*.log
+*.cache
+*.tmp
+*.ds_store
+
+# Игнорировать папки IDE
+.idea/
+.vscode/
+*.sublime-project
+*.sublime-workspace
+
+# Игнорировать артефакты Docker
+*.dockerignore
+docker-compose.yml

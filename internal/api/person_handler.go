@@ -4,6 +4,7 @@ import (
 	"github.com/drag0nfet/effective-mobile-test/internal/models"
 	"github.com/drag0nfet/effective-mobile-test/internal/service"
 	"github.com/gin-gonic/gin"
+	"github.com/sirupsen/logrus"
 	"net/http"
 	"strconv"
 )
@@ -16,16 +17,28 @@ func NewPersonHandler(service *service.PersonService) *PersonHandler {
 	return &PersonHandler{service: service}
 }
 
+// CreatePerson godoc
+// @Summary Create a new person
+// @Description Create a new person with name, surname, and optional patronymic
+// @Accept json
+// @Produce json
+// @Param person body models.Person true "Person data"
+// @Success 201 {object} models.Person
+// @Failure 400 {object} map[string]string
+// @Failure 500 {object} map[string]string
+// @Router /persons [post]
 func (h *PersonHandler) CreatePerson(c *gin.Context) {
 	var person models.Person
 	if err := c.ShouldBindJSON(&person); err != nil {
 		c.JSON(http.StatusBadRequest, gin.H{"error": err.Error()})
 		return
 	}
+	logrus.Debugf("Creating person with name: %s", person.Name)
 	if err := h.service.CreatePerson(&person); err != nil {
 		c.JSON(http.StatusInternalServerError, gin.H{"error": err.Error()})
 		return
 	}
+	logrus.Debugf("Successfully created person with name: %s", person.Name)
 	c.JSON(http.StatusCreated, person)
 }
 
@@ -122,6 +135,7 @@ func (h *PersonHandler) UpdatePerson(c *gin.Context) {
 	person.ID = uint(id)
 
 	// Вызов сервиса для обновления
+	logrus.Debugf("Updating person with id: %d", id)
 	if err := h.service.UpdatePerson(&person); err != nil {
 		if err.Error() == "person not found" {
 			c.JSON(http.StatusNotFound, gin.H{"error": "person not found"})
@@ -130,6 +144,7 @@ func (h *PersonHandler) UpdatePerson(c *gin.Context) {
 		c.JSON(http.StatusInternalServerError, gin.H{"error": err.Error()})
 		return
 	}
+	logrus.Debugf("Successfully updated person with id: %d", id)
 
 	c.JSON(http.StatusOK, person)
 }

@@ -4,7 +4,6 @@ import (
 	"github.com/drag0nfet/effective-mobile-test/internal/service"
 	"github.com/gin-gonic/gin"
 	"github.com/sirupsen/logrus"
-	"net/http"
 	"time"
 )
 
@@ -12,16 +11,9 @@ import (
 func SetupRoutes(r *gin.Engine, personService *service.PersonService) {
 	r.Use(loggingMiddleware)
 
-	// Тестовый эндпоинт
-	r.GET("/ping", func(c *gin.Context) {
-		c.JSON(http.StatusOK, gin.H{
-			"message": "pong",
-		})
-	})
-
 	personHandler := NewPersonHandler(personService)
 
-	// Базовые маршруты для работы с Person
+	// Маршруты для работы с Person
 	r.POST("/persons", personHandler.CreatePerson)
 	r.GET("/persons", personHandler.GetPeople)
 	r.PUT("/persons/:id", personHandler.UpdatePerson)

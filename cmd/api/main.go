@@ -1,13 +1,16 @@
 package main
 
 import (
+	"github.com/drag0nfet/effective-mobile-test/internal/api"
 	"github.com/drag0nfet/effective-mobile-test/internal/config"
 	"github.com/drag0nfet/effective-mobile-test/internal/repository"
-	_ "github.com/drag0nfet/effective-mobile-test/internal/service"
+	"github.com/drag0nfet/effective-mobile-test/internal/service"
 	"github.com/gin-gonic/gin"
 	"github.com/sirupsen/logrus"
 	"github.com/swaggo/files"
 	"github.com/swaggo/gin-swagger"
+	"os"
+	"time"
 )
 
 func main() {
@@ -21,22 +24,29 @@ func main() {
 	logrus.SetFormatter(&logrus.JSONFormatter{})
 	logrus.SetLevel(logrus.DebugLevel)
 
+	// Перенаправляем логи в файл, который инициализируется при запуске сервера
+	timestamp := time.Now().Format("2006-01-02-15-04-05")
+	logFile, err := os.OpenFile("app_"+timestamp+".log", os.O_CREATE|os.O_WRONLY|os.O_TRUNC, 0666)
+	if err != nil {
+		logrus.Fatalf("Failed to open log file: %v", err)
+	}
+	defer logFile.Close()
+	logrus.SetOutput(logFile)
+
 	// Подключение к БД
-	/*repo*/
-	_, err = repository.NewPersonRepository(cfg)
+	repo, err := repository.NewPersonRepository(cfg)
 	if err != nil {
 		logrus.Fatalf("Failed to initialize repository: %v", err)
 	}
 
-	// Инициализация Gin
-	r := gin.Default()
+	// Инициализация сервиса
+	svc := service.NewPersonService(repo)
 
-	// Запрос-тестер, позже здесь будут основные запросы
-	r.GET("/ping", func(c *gin.Context) {
-		c.JSON(200, gin.H{
-			"message": "pong",
-		})
-	})
+	r := gin.New()
+	r.Use(gin.Recovery()) // Оставляем только GIN-обработку паник, чтобы не было захламления логов
+
+	// Настройка маршрутов
+	api.SetupRoutes(r, svc)
 
 	// Инициализация swag-запросов
 	r.GET("/swagger/*any", ginSwagger.WrapHandler(swaggerFiles.Handler))

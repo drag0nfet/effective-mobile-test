@@ -12,7 +12,7 @@ type Config struct {
 	DBName            string `mapstructure:"DB_NAME"`
 	APIPort           string `mapstructure:"API_PORT"`
 	AgifyAPIURL       string `mapstructure:"AGIFY_API_URL"`
-	GenderizeAPIURL   string `mapstructure:"/erize_API_URL"`
+	GenderizeAPIURL   string `mapstructure:"GENDERIZE_API_URL"`
 	NationalizeAPIURL string `mapstructure:"NATIONALIZE_API_URL"`
 	HTTPClientTimeout string `mapstructure:"HTTP_CLIENT_TIMEOUT"`
 }

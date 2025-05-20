@@ -16,14 +16,6 @@ func NewPersonHandler(service *service.PersonService) *PersonHandler {
 	return &PersonHandler{service: service}
 }
 
-func SetupRoutes(r *gin.Engine, service *service.PersonService) {
-	handler := NewPersonHandler(service)
-	r.POST("/persons", handler.CreatePerson)
-	r.GET("/persons", handler.GetPeople)
-	r.PUT("/persons/:id", handler.UpdatePerson)
-	r.DELETE("/persons/:id", handler.DeletePerson)
-}
-
 func (h *PersonHandler) CreatePerson(c *gin.Context) {
 	var person models.Person
 	if err := c.ShouldBindJSON(&person); err != nil {
